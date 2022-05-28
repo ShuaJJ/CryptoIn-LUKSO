@@ -25,6 +25,7 @@ import {
   NetworkSwitch,
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
+import axios from "axios";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
@@ -32,6 +33,7 @@ import { Transactor, Web3ModalSetup } from "./helpers";
 import { Home, ExampleUI, MyAccount, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 import RSS3, { utils as RSS3Utils } from 'rss3';
+import { generateNextIDSignature } from "./helpers/nextID";
 
 const { ethers } = require("ethers");
 /*
@@ -122,15 +124,33 @@ function App(props) {
       if (userSigner) {
         const newAddress = await userSigner.getAddress();
         setAddress(newAddress);
-
+        
         const r3 = new RSS3({
-            endpoint: 'https://prenode.rss3.dev',
-            address: newAddress,
-            sign: async (data) => await userSigner.signMessage(data),
+          endpoint: 'https://prenode.rss3.dev',
+          address: newAddress,
+          sign: async (data) => await userSigner.signMessage(data),
         });
         setRss3(r3);
+        
+        // const pubKey = await generateNextIDSignature(newAddress);
+        // const nextIdResponse = await axios.post("https://proof-service.nextnext.id/v1/proof/payload", {
+          //   "action": "create",
+          //   "platform": "ethereum",
+          //   "identity": newAddress,
+          //   "public_key": pubKey
+        // });
 
-        const nextIdResponse = await axios.get("https://proof-service.nextnext.id/v1/proof/exists?platform=ethereum&identity=some_twitter_screenname&public_key=0x04c7cacde73af939c35d527b34e0556ea84bab27e6c0ed7c6c59be70f6d2db59c206b23529977117dc8a5d61fa848f94950422b79d1c142bcf623862e49f9e6575");
+        // console.log('OOOO', nextIdResponse);
+
+        // const account1 = {
+        //   id: RSS3Utils.id.getAccount('NextIDPubKey', pubKey), // 'Twitter-DIYgod'
+        // };
+        // await rss3.profile.accounts.post(account1);
+        // const account2 = {
+        //   id: RSS3Utils.id.getAccount('NextIDUUID', nextIdResponse.body.uuid), // 'Twitter-DIYgod'
+        // };
+        // await rss3.profile.accounts.post(account2);
+        // await rss3.files.sync();
       }
     }
     getAddress();
