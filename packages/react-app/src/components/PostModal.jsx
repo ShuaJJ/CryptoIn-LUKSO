@@ -1,23 +1,25 @@
 import { Modal, Input, notification, Upload } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import Arweave from "arweave";
 import Compressor from 'compressorjs';
 import { useState } from 'react';
+import ArweaveImage from './ArweaveImage';
 const { TextArea } = Input;
 const { Dragger } = Upload;
 
 const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
 
     var imageType;
-    var uploadTx;
 
     const [content, setContent] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [uploadTx, setUploadTx] = useState();
 
     const initOptions = {
         host: "arweave.net",
         port: 443,
         protocol: "https",
-        timeout: 20000,
+        timeout: 60000,
         logging: true,
       };
 
@@ -35,10 +37,11 @@ const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
                 await uploader.uploadChunk();
                 console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
             }
-            uploadTx = tx;
-            console.log('PPPP', tx.id);
+            setUploadTx(tx);
+            setLoading(false);
         } catch(e) {
             console.error("uploadError", e);
+            setLoading(false);
         }
       };
 
@@ -50,28 +53,6 @@ const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
         const data = event.target.result;
         runUpload(data, imageType)
       }
-
-      const props = {
-        name: 'file',
-        multiple: false,
-        customRequest: (info) => {
-            imageType = info.type;
-            new Compressor(info.file, {
-                quality: 0.6,
-                success(result) {
-                    const reader = new FileReader();
-                    reader.onload = handleFileLoad;
-                    reader.readAsDataURL(result);
-                },
-                error(err) {
-                  console.log(err.message);
-                },
-              });
-        },
-        onDrop(e) {
-          console.log('Dropped files', e.dataTransfer.files);
-        },
-      };
 
     const post = () => {
         if (!content && !uploadTx) {
@@ -87,22 +68,47 @@ const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
 
     const clear = () => {
         imageType = null;
-        uploadTx = null;
+        setUploadTx(null);
         setContent('');
     }
 
+    const customRequest = (info) => {
+        imageType = info.type;
+        setLoading(true);
+        new Compressor(info.file, {
+            quality: 0.6,
+            success(result) {
+                const reader = new FileReader();
+                reader.onload = handleFileLoad;
+                reader.readAsDataURL(result);
+            },
+            error(err) {
+              console.log(err.message);
+            },
+          });
+    };
+
+
   return (
     <Modal title="Post something about your work or project" visible={isModalVisible} onOk={post} onCancel={handleCancel} afterClose={clear}>
-        <Dragger {...props}>
-            <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">Click or drag file to this area to upload</p>
-            <p className="ant-upload-hint">
-            Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-            band files
-            </p>
-        </Dragger>
+        <div style={{textAlign: "center"}}>
+            <Upload
+                name="Image File"
+                multiple={false}
+                listType="picture-card"
+                className="file-uploader"
+                showUploadList={false}
+                customRequest={customRequest}
+            >
+                {uploadTx ? (
+                    <ArweaveImage txId={uploadTx.id} />
+                ) : (<div>
+                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
+                    <div style={{ marginTop: 8 }}>Upload</div>
+                </div>)}
+            </Upload>
+        </div>
+        
         <TextArea showCount maxLength={140} style={{ height: 100 }} onChange={onChange} value={content} />
     </Modal>
   );
