@@ -7,12 +7,12 @@ import ArweaveImage from './ArweaveImage';
 const { TextArea } = Input;
 const { Dragger } = Upload;
 
-const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
-
-    var imageType;
+const PostModal = ({isModalVisible, handleOk, handleCancel, rss3}) => {
 
     const [content, setContent] = useState('');
+    const [imageType, setImageType] = useState();
     const [loading, setLoading] = useState(false);
+    const [postLoading, setPostLoading] = useState(false);
     const [uploadTx, setUploadTx] = useState();
 
     const initOptions = {
@@ -54,7 +54,8 @@ const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
         runUpload(data, imageType)
       }
 
-    const post = () => {
+    const post = async () => {
+        setPostLoading(true);
         if (!content && !uploadTx) {
             notification['error']({
                 message: 'Error',
@@ -62,18 +63,38 @@ const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
                   'Please write something or upload an image at least',
               });
         } else {
-            handleOk(content, uploadTx);
+            var postContent = {
+                summary: content
+            };
+            if (uploadTx) {
+                postContent["contents"] = [{
+                    mime_type: imageType,
+                    address: ['https://arweave.net/'+uploadTx.id],
+                }];
+            }
+            try {
+                await rss3.items.custom.post(postContent);
+                await rss3.files.sync();
+                setPostLoading(false);
+                handleOk();
+            } catch(e) {
+                setPostLoading(false);
+                notification['error']({
+                    message: 'Error',
+                    description: e.toString(),
+                  });
+            }
         }
     }
 
     const clear = () => {
-        imageType = null;
+        setImageType(null);
         setUploadTx(null);
         setContent('');
     }
 
     const customRequest = (info) => {
-        imageType = info.type;
+        setImageType(info.file.type);
         setLoading(true);
         new Compressor(info.file, {
             quality: 0.6,
@@ -90,8 +111,15 @@ const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
 
 
   return (
-    <Modal title="Post something about your work or project" visible={isModalVisible} onOk={post} onCancel={handleCancel} afterClose={clear}>
-        <div style={{textAlign: "center"}}>
+    <Modal 
+        title="Post something about your work or project" 
+        visible={isModalVisible} 
+        onOk={post} 
+        onCancel={handleCancel} 
+        afterClose={clear}
+        okButtonProps={{loading: postLoading}}
+    >
+        <div style={{textAlign: "center", marginBottom: "15px"}}>
             <Upload
                 name="Image File"
                 multiple={false}
@@ -101,7 +129,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel}) => {
                 customRequest={customRequest}
             >
                 {uploadTx ? (
-                    <ArweaveImage txId={uploadTx.id} />
+                    <ArweaveImage txId={"https://arweave.net/"+uploadTx.id} />
                 ) : (<div>
                     {loading ? <LoadingOutlined /> : <PlusOutlined />}
                     <div style={{ marginTop: 8 }}>Upload</div>

@@ -34,6 +34,7 @@ import { Home, ExampleUI, MyAccount, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 import RSS3, { utils as RSS3Utils } from 'rss3';
 import { generateNextIDSignature } from "./helpers/nextID";
+import Following from "./views/Following";
 
 const { ethers } = require("ethers");
 /*
@@ -81,7 +82,7 @@ function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
   const [rss3, setRss3] = useState();
-  const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
+  const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[2]);
   const location = useLocation();
 
   const targetNetwork = NETWORKS[selectedNetwork];
@@ -307,12 +308,10 @@ function App(props) {
           </div>
         </div>
       </Header>
-      {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
-        <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
-      )}
+
       <Menu style={{ textAlign: "center", marginTop: 20, borderBottom: "none" }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
-          <Link to="/" className="linkTitle">All</Link>
+          <Link to="/" className="linkTitle">Featured</Link>
         </Menu.Item>
         <Menu.Item key="/following">
           <Link to="/following" className="linkTitle">Following</Link>
@@ -325,29 +324,22 @@ function App(props) {
       <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
+          <Home rss3={rss3} />
         </Route>
         <Route exact path="/following">
-          {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-          <Contract
-            name="YourContract"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
+          <Following />
         </Route>
         <Route path="/mine">
-          <MyAccount provider={userProviderAndSigner} address={address} loadWeb3Modal={loadWeb3Modal} />
+          <MyAccount provider={userProviderAndSigner} address={address} loadWeb3Modal={loadWeb3Modal} rss3={rss3} />
         </Route>
       </Switch>
+
+      <div className="footer">
+              <strong>Stack</strong>
+              <p>Read and post feeds - <a href="https://rss3.io/" target="_blank"><img src="/rss3.svg" /> rss3</a></p>
+              <p>Permanent storage service - <a href="https://www.arweave.org/" target="_blank"><img src="/nav-logo.svg" /> arweave</a></p>
+              <p>Contracts editor and deployment - <a href="https://chainide.com/" target="_blank">ChainIDE</a></p>
+      </div>
     </div>
   );
 }

@@ -1,15 +1,10 @@
+
 import { LoadingOutlined } from "@ant-design/icons";
 import React, {useState, useEffect} from "react";
 import CryptoInGrid from "../components/Grid";
 
-/**
- * web3 props can be passed from '../App.jsx' into your local view component for use
- * @param {*} yourLocalBalance balance on current network
- * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
- * @returns react component
- **/
-function Home({ rss3 }) {
-  
+export default function Following({ address, rss3 }) {
+
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -18,8 +13,9 @@ function Home({ rss3 }) {
       setLoading(true);
       try {
         const page1 = await rss3.items.getList({
-            persona: '0xe6259caE435525D698b26E6c5792CA8E6B410D2C',
+            persona: address,
             limit: 12,
+            linkID: 'following',
         });
         setActivities(page1);
         setLoading(false);
@@ -33,18 +29,24 @@ function Home({ rss3 }) {
   useEffect(() => {
     getActivities();
   }, [rss3])
+  
+  if (loading) {
+    return <div style={{fontSize: '32px', color: '#fff', margin: '32px 0', textAlign: 'center'}}>
+        <LoadingOutlined />
+      </div>
+  }
+
+  if (activities.length == 0) {
+    return <div style={{textAlign: 'center', marginTop: '32px'}}>
+              You haven't followed anyone yet...
+            </div>
+  }
 
   return (
     <div>
-      {loading ? 
-      <div style={{fontSize: '32px', color: '#fff', margin: '32px 0', textAlign: 'center'}}>
-        <LoadingOutlined />
-      </div> : <div style={{margin: '32px auto', maxWidth: "1000px"}}>
+      <div style={{margin: '32px auto', maxWidth: "1000px"}}>
         <CryptoInGrid activities={activities} columnCount={5} />
       </div>
-      }
     </div>
   );
 }
-
-export default Home;

@@ -3,12 +3,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 
-export default function ArweaveImage({ txId, width = "100%", height = "100px" }) {
+export default function ArweaveImage({ txId, width = "100%", height = "auto" }) {
 
     const [data, setData] = useState();
 
     const getImageData = async () => {
-        const imageData = await axios.get("https://arweave.net/"+txId);
+        const imageData = await axios.get(txId);
         setData(imageData.data);
     }
   
@@ -17,8 +17,8 @@ export default function ArweaveImage({ txId, width = "100%", height = "100px" })
     }, []);
   
     if (data) {
-        return <img src={data} style={{width, height}} />
+        return <img src={data} style={{width, height, borderRadius: '8px'}} />
     }
 
-    return <div style={{width, height, background: "#ccc", color: "#666"}}><LoadingOutlined /></div>
+    return <div style={{width, height: '100px', background: "#ccc", color: "#666", paddingTop: '32px'}}><LoadingOutlined /></div>
   }
