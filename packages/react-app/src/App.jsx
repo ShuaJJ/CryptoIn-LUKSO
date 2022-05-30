@@ -35,6 +35,7 @@ import { useStaticJsonRPC } from "./hooks";
 import RSS3, { utils as RSS3Utils } from 'rss3';
 import { generateNextIDSignature } from "./helpers/nextID";
 import Following from "./views/Following";
+import Deposit from "./components/Deposit";
 
 const { ethers } = require("ethers");
 /*
@@ -292,6 +293,7 @@ function App(props) {
                 />
               </div>
             )}
+            <Deposit address={address} signer={userSigner} />
             <Account
               useBurner={USE_BURNER_WALLET}
               address={address}
