@@ -37,6 +37,8 @@ import { generateNextIDSignature } from "./helpers/nextID";
 import Following from "./views/Following";
 import Deposit from "./components/Deposit";
 import Tip from "./components/Tip";
+import Conversations from "./views/Conversations";
+import { LoadingOutlined } from "@ant-design/icons";
 
 const { ethers } = require("ethers");
 /*
@@ -326,6 +328,9 @@ function App(props) {
         <Menu.Item key="/mine">
           <Link to="/mine" className="linkTitle">Mine</Link>
         </Menu.Item>
+        <Menu.Item key="/chats">
+          <Link to="/chats" className="linkTitle">Chats</Link>
+        </Menu.Item>
       </Menu>
 
       <Switch>
@@ -338,6 +343,9 @@ function App(props) {
         </Route>
         <Route path="/mine">
           <MyAccount provider={userProviderAndSigner} address={address} loadWeb3Modal={loadWeb3Modal} rss3={rss3} />
+        </Route>
+        <Route exact path="/chats">
+          {userSigner ? <Conversations signer={userSigner} /> : <LoadingOutlined />}
         </Route>
       </Switch>
 

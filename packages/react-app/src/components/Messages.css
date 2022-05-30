@@ -1,0 +1,29 @@
+.messages {
+    padding-bottom: 80px;
+    height: 100%;
+}
+
+.drawer-wrapper {
+    position: relative;
+}
+
+.ant-input-group.send-input {
+    position: absolute;
+    bottom: 32px;
+}
+
+.my-message {
+    text-align: right;
+}
+
+.msg-item {
+    background: #ccc;
+    color: #222;
+}
+
+.my-message .msg-item {
+    background: rgb(142, 226, 142);
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+

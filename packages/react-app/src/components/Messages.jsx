@@ -1,0 +1,92 @@
+import { useState, useEffect } from "react"
+import { Drawer, Button, Input, notification } from 'antd';
+import './Messages.css';
+
+
+export default function Messages({ client, recipient }) {
+
+    const [conversation, setConversation] = useState(null)
+    const [messages, setMessages] = useState([]);
+    const [sendLoading, setSendLoading] = useState(false);
+    const [msg, setMsg] = useState('');
+
+    const [visible, setVisible] = useState(false);
+
+    const showDrawer = async () => {
+        setVisible(true);
+        setConversation(await client.conversations.newConversation(recipient))
+    };
+
+    const onClose = () => {
+        setVisible(false);
+    };
+
+    const sendMsg = async () => {
+        if (!msg || msg.length < 2) {
+            notification['error']({
+                message: "Error",
+                description: "Msg too short"
+            })
+            return;
+        }
+        if (conversation) {
+            setSendLoading(true)
+            try {
+                await conversation.send(msg)
+                setSendLoading(false)
+                setMsg('');
+                getMsgs();
+            } catch(e) {
+                notification['error']({
+                    message: "Error",
+                    description: "Message cannot be sent"
+                })
+                setSendLoading(false)
+            }
+        } else {
+            notification['error']({
+                message: "Error",
+                description: "Conversation was not initialized"
+            })
+        }
+    }
+
+    const onChange = (e) => {
+        setMsg(e.target.value);
+      };
+
+    const getMsgs = async () => {
+        if (!conversation) {
+          return
+        }
+        setMessages(await conversation.messages({ pageSize: 100 }))
+      }
+
+      useEffect(() => {
+        getMsgs()
+      }, [conversation])
+
+    return (
+      <div>
+        <div className="conversation-item" onClick={showDrawer}>
+            {client && recipient}
+        </div>
+        <Drawer title={"Chat with " + recipient} placement="right" onClose={onClose} visible={visible} className="drawer-wrapper" width={555}>
+            <div className="messages">
+                {messages.map((msg) => {
+                    const isSender = msg.senderAddress === recipient
+                    return (
+                <div key={msg.id} className={isSender ? "message" :"my-message" }>
+                    <span className="msg-item">{msg.content}</span>
+                </div>
+                )})}
+            </div>
+            <Input.Group compact className="send-input">
+                <Input style={{ width: 'calc(100% - 110px)' }} value={msg} onChange={onChange} />
+                <Button style={{width: "60px"}} type="primary" onClick={sendMsg} loading={sendLoading}>Send</Button>
+            </Input.Group>
+        </Drawer>
+      </div>
+    );
+  }
+  
