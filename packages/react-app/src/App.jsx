@@ -36,6 +36,7 @@ import RSS3, { utils as RSS3Utils } from 'rss3';
 import { generateNextIDSignature } from "./helpers/nextID";
 import Following from "./views/Following";
 import Deposit from "./components/Deposit";
+import Tip from "./components/Tip";
 
 const { ethers } = require("ethers");
 /*
@@ -82,6 +83,7 @@ function App(props) {
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
+  const [isRinkeby, setIsRinkeby] = useState(false);
   const [rss3, setRss3] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[2]);
   const location = useLocation();
@@ -126,6 +128,9 @@ function App(props) {
       if (userSigner) {
         const newAddress = await userSigner.getAddress();
         setAddress(newAddress);
+
+        const chainId = await userSigner.getChainId();
+        setIsRinkeby(chainId == 4);
         
         const r3 = new RSS3({
           endpoint: 'https://prenode.rss3.dev',
@@ -283,7 +288,7 @@ function App(props) {
       <Header>
         {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
         <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", flex: 1 }}>
+          <div style={{ display: "flex", flex: 1, paddingTop: "8px" }}>
             {USE_NETWORK_SELECTOR && (
               <div style={{ marginRight: 20 }}>
                 <NetworkSwitch
@@ -293,7 +298,7 @@ function App(props) {
                 />
               </div>
             )}
-            <Deposit address={address} signer={userSigner} />
+            {isRinkeby ? <Deposit address={address} signer={userSigner} /> : (userSigner && <span>Please switch to Rinkeby</span>)}
             <Account
               useBurner={USE_BURNER_WALLET}
               address={address}
@@ -337,10 +342,14 @@ function App(props) {
       </Switch>
 
       <div className="footer">
-              <strong>Stack</strong>
+              <strong style={{fontSize: '17px'}}>Stack</strong>
               <p>Read and post feeds - <a href="https://rss3.io/" target="_blank"><img src="/rss3.svg" /> rss3</a></p>
               <p>Permanent storage service - <a href="https://www.arweave.org/" target="_blank"><img src="/nav-logo.svg" /> arweave</a></p>
               <p>Contracts editor and deployment - <a href="https://chainide.com/" target="_blank">ChainIDE</a></p>
+              <br/>
+              <strong style={{fontSize: '17px'}}>Joshua Jiang - The Developer</strong>
+              <div style={{marginBottom: "15px"}}>I am a web3 developer who is currently working for <a href="https://theunit.one">The Unit</a>. I am glad about registering this Hackthon and learned all these new projects. </div>
+              {isRinkeby && <Tip signer={userSigner} />}
       </div>
     </div>
   );

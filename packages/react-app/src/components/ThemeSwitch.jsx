@@ -1,3 +1,4 @@
+import { BulbFilled, BulbOutlined } from "@ant-design/icons";
 import { Switch } from "antd";
 import React, { useEffect, useState } from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
@@ -11,15 +12,15 @@ export default function ThemeSwitcher() {
     window.localStorage.setItem("theme", currentTheme);
   }, [currentTheme]);
 
-  const toggleTheme = isChecked => {
+  const toggleTheme = () => {
+    const isChecked = !isDarkMode;
     setIsDarkMode(isChecked);
     switcher({ theme: isChecked ? themes.dark : themes.light });
   };
 
   return (
-    <div className="main fade-in" style={{ paddingTop: "12px" }}>
-      <span style={{ padding: 8 }}>{currentTheme === "light" ? "☀️" : "🌜"}</span>
-      <Switch checked={isDarkMode} onChange={toggleTheme} />
+    <div className="main fade-in" onClick={toggleTheme} style={{padding: "0 8px", fontSize: "20px", cursor: "pointer"}}>
+      {isDarkMode ? <BulbOutlined /> : <BulbFilled />}
     </div>
   );
 }

@@ -56,7 +56,7 @@ export default function Account({
   );
 
   return (
-    <div style={{ display: "flex", paddingTop: "8px" }}>
+    <div style={{ display: "flex"}}>
       {showDisplay && display}
       {web3Modal && (
         <Button
