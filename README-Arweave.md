@@ -2,6 +2,10 @@
 
 The site url is https://crypto-in.surge.sh
 
+And here is the demo video:
+
+https://youtu.be/kdYDGZlbdAk
+
 ## Here are some details about how I integrate my dapp with Arweave
 
 1. The homepage is showing feeds from rss3, all the images are stored using Arweave permanent storage service.
