@@ -1,6 +1,5 @@
 import { Menu } from "antd";
 import "antd/dist/antd.css";
-import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
 import "./App.css";
@@ -65,9 +64,6 @@ function App(props) {
       window.location.reload();
     }, 1);
   };
-
-  /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
 
   useEffect(() => {
     async function getAddress() {
@@ -157,7 +153,6 @@ function App(props) {
               localProvider={localProvider}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
-              price={price}
               web3Modal={web3Modal}
               loadWeb3Modal={loadWeb3Modal}
               logoutOfWeb3Modal={logoutOfWeb3Modal}
@@ -183,7 +178,7 @@ function App(props) {
         </Menu.Item>
       </Menu>
 
-      <Switch>
+      {userSigner ? <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
           <Home rss3={rss3} />
@@ -195,15 +190,18 @@ function App(props) {
           <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} rss3={rss3} />
         </Route>
         <Route exact path="/chats">
-          {userSigner ? <Conversations provider={injectedProvider} /> : <LoadingOutlined />}
+          <Conversations provider={injectedProvider} />
         </Route>
-      </Switch>
+      </Switch> : <div style={{color: "#00ACF1", fontSize: "18px", marginTop: '32px', fontWeight: "600"}}>Please connect your wallet first</div>}
 
       <div className="footer">
               <strong style={{fontSize: '17px'}}>Stack</strong>
               <p>Read and post feeds - <a href="https://rss3.io/" target="_blank"><img src="/rss3.svg" /> rss3</a></p>
               <p>Permanent storage service - <a href="https://www.arweave.org/" target="_blank"><img src="/nav-logo.svg" /> arweave</a></p>
               <p>Contracts editor and deployment - <a href="https://chainide.com/" target="_blank">ChainIDE</a></p>
+              <p>Chats feature(secure messaging protocol) - <a href="https://xmtp.com/" target="_blank"><img src="https://xmtp.com/logos/main.svg" /> XMTP Labs</a></p>
+              <p>Decentralized Access Control - <a href="https://litprotocol.com/" target="_blank"><img src="https://litprotocol.com/lit-logo.png" /> Lit Protocol</a></p>
+              <p>Follow Connections - <a href="https://cyberconnect.me/" target="_blank"><img src="https://cyberconnect.me/_next/image?url=%2Fassets%2Fgrains.svg&w=64&q=75" /> CyberConnect</a></p>
               <br/>
               <strong style={{fontSize: '17px'}}>Joshua Jiang - The Developer</strong>
               <div style={{marginBottom: "15px"}}>I am a web3 developer who is currently working for <a href="https://theunit.one">The Unit</a>. I am glad about registering this Hackthon and learned all these new projects. </div>

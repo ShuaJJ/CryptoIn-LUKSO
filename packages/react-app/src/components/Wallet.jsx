@@ -254,15 +254,6 @@ export default function Wallet(props) {
             onChange={setToAddress}
           />
         </div>
-        <div style={inputStyle}>
-          <EtherInput
-            price={props.price}
-            value={amount}
-            onChange={value => {
-              setAmount(value);
-            }}
-          />
-        </div>
       </div>
     );
     receiveButton = (
@@ -297,9 +288,6 @@ export default function Wallet(props) {
         title={
           <div>
             {selectedAddress ? <Address address={selectedAddress} ensProvider={props.ensProvider} /> : <Spin />}
-            <div style={{ float: "right", paddingRight: 25 }}>
-              <Balance address={selectedAddress} provider={props.provider} dollarMultiplier={props.price} />
-            </div>
           </div>
         }
         onOk={() => {

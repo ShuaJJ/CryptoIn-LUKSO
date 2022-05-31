@@ -35,6 +35,16 @@
     margin-left: 120px;
 }
 
+.conversation-item .nft-btns button {
+    margin-left: 15px;
+    width: 215px;
+    height: 36px;
+}
+
+.conversation-item .nft-btns {
+    padding-top: 20px;
+}
+
 .conversation-item img {
     width: 64px;
     border-radius: 32px;

@@ -17,6 +17,7 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
     const [followed, setFollowed] = useState(false);
     const [followLoading, setFollowLoading] = useState(false);
     const [mintLoading, setMintLoading] = useState(false);
+    const [ownNFT, setOwnNFT] = useState(false);
 
     const [visible, setVisible] = useState(false);
 
@@ -72,20 +73,24 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
 
     const checkNFT = async () => {
         try {
+            await litClient.connect();
             const authSig = await LitJsSdk.checkAndSignAuthMessage({chain})
-            // await litClient.saveSigningCondition({ accessControlConditions, chain, authSig, resourceId });
-            // console.log('UUUUUU3', authSig);
             const jwt = await litClient.getSignedToken({ accessControlConditions, chain, authSig, resourceId });
-            console.log('UUUUUU', jwt);
+            if (jwt) {
+                setOwnNFT(true);
+            }
         } catch(e) {
-            console.log('UUUUUU2', e);
+            setOwnNFT(false);
+            notification['error']({
+                message: 'Error',
+                description: e.toString()
+            })
         }
     }
 
     const mintNFT = async () => {
         setMintLoading(true);
         await nftContract.safeMint();
-        await checkNFT();
         setMintLoading(false);
     }
 
@@ -104,7 +109,7 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
 
     const getFollowers = async () => {
         const res = await graphClient.request(GET_CONNECTIONS, { address: client.address, recipient: recipient.address });
-        if (res?.connections) {
+        if (res?.connections && res?.connections.length > 0) {
             setFollowed(res.connections[0].followStatus.isFollowed);
         } else {
             setFollowed(false);
@@ -113,7 +118,12 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
 
     const showDrawer = async () => {
         setVisible(true);
-        setConversation(await client.conversations.newConversation(recipient.address))
+        try {
+            const nconv = await client.conversations.newConversation(recipient.address);
+            setConversation(nconv);
+        } catch(e) {
+            console.log('UUUUU1', e);
+        }
     };
 
     const onClose = () => {
@@ -157,11 +167,6 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
         }
     }
 
-    const setupLitClient = async () => {
-        await litClient.connect();
-        checkNFT();
-    }
-
     const onChange = (e) => {
         setMsg(e.target.value);
       };
@@ -170,7 +175,11 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
         if (!conversation) {
           return
         }
-        setMessages(await conversation.messages({ pageSize: 100 }))
+        try {
+            setMessages(await conversation.messages({ pageSize: 100 }))
+        } catch(e) {
+            console.log('UUUUU2', e);
+        }
       }
 
       useEffect(() => {
@@ -179,7 +188,6 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
 
       useEffect(() => {
         getFollowers()
-        setupLitClient();
       }, [])
 
       const getActionButton = () => {
@@ -206,13 +214,27 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
               }
           } else {
             return (
+                <div className="nft-btns">
+                {ownNFT ? <Button 
+                        onClick={showDrawer}
+                        type="primary"
+                    >
+                        Chat
+                    </Button> : <Button 
+                    onClick={() => { checkNFT() }}
+                    type="primary"
+                    loading={mintLoading}
+                >
+                    Check Ownership
+                </Button>}
                 <Button 
                     onClick={() => { mintNFT() }}
                     type="primary"
                     loading={mintLoading}
                 >
-                    Mint
+                    Mint a CryptoIn NFT for free
                 </Button>
+                </div>
               )
           }
       }
