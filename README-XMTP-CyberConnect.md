@@ -4,7 +4,7 @@ The site url is https://crypto-in.surge.sh
 
 And here is the demo video:
 
-https://youtu.be/97sHgnBQ7T8
+https://youtu.be/BU38Yvc3gS8
 
 ## Here are some details about how I integrate my dapp with CyberConnect and XMTP
 
