@@ -4,6 +4,8 @@ The site url is https://crypto-in.surge.sh
 
 And here is the demo video:
 
+https://youtu.be/97sHgnBQ7T8
+
 ## Here are some details about how I integrate my dapp with CyberConnect
 
 1. If user goes to the chats tab, it will first initialize the CyberConnect client.
