@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react"
 import { Drawer, Button, Input, notification } from 'antd';
 import { GraphQLClient, gql } from "graphql-request";
+import LitJsSdk from 'lit-js-sdk';
 import CyberConnect, { Env, Blockchain } from "@cyberlab/cyberconnect";
+import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
 import './Messages.css';
 
+const ethers = require("ethers");
 
 export default function Messages({ provider, client, recipient, isCyberConnect }) {
 
@@ -13,10 +16,40 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
     const [msg, setMsg] = useState('');
     const [followed, setFollowed] = useState(false);
     const [followLoading, setFollowLoading] = useState(false);
+    const [mintLoading, setMintLoading] = useState(false);
 
     const [visible, setVisible] = useState(false);
 
     const graphClient = new GraphQLClient("https://api.cybertino.io/connect/");
+    const litClient = new LitJsSdk.LitNodeClient();
+    const nftContractAddress = "0xDD284A2BCA27495A982e79720Bf29cc599684bd1";
+    const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
+
+    const chain = 'rinkeby';
+
+    const accessControlConditions = [
+        {
+          contractAddress: nftContractAddress,
+          standardContractType: 'ERC721',
+          chain,
+          method: 'balanceOf',
+          parameters: [
+            ':userAddress'
+          ],
+          returnValueTest: {
+            comparator: '>',
+            value: '0'
+          }
+        }
+      ]
+    
+    const resourceId = {
+        baseUrl: '',
+        path: '/cryptoin', // this would normally be your url path, like "/webpage.html" for example
+        orgId: "",
+        role: "",
+        extraData: ""
+    }
 
     const cyberConnect = new CyberConnect({
         namespace: "CryptoIn",
@@ -35,6 +68,25 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
     
     const unfollow = async (targetAddr) => {
       await cyberConnect.disconnect(targetAddr);
+    }
+
+    const checkNFT = async () => {
+        try {
+            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain})
+            // await litClient.saveSigningCondition({ accessControlConditions, chain, authSig, resourceId });
+            // console.log('UUUUUU3', authSig);
+            const jwt = await litClient.getSignedToken({ accessControlConditions, chain, authSig, resourceId });
+            console.log('UUUUUU', jwt);
+        } catch(e) {
+            console.log('UUUUUU2', e);
+        }
+    }
+
+    const mintNFT = async () => {
+        setMintLoading(true);
+        await nftContract.safeMint();
+        await checkNFT();
+        setMintLoading(false);
     }
 
     const GET_CONNECTIONS = gql`
@@ -105,6 +157,11 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
         }
     }
 
+    const setupLitClient = async () => {
+        await litClient.connect();
+        checkNFT();
+    }
+
     const onChange = (e) => {
         setMsg(e.target.value);
       };
@@ -122,6 +179,7 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
 
       useEffect(() => {
         getFollowers()
+        setupLitClient();
       }, [])
 
       const getActionButton = () => {
@@ -146,6 +204,16 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
                     </Button>
                   )
               }
+          } else {
+            return (
+                <Button 
+                    onClick={() => { mintNFT() }}
+                    type="primary"
+                    loading={mintLoading}
+                >
+                    Mint
+                </Button>
+              )
           }
       }
 

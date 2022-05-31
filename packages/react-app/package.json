@@ -49,6 +49,7 @@
     "graphql-request": "^4.2.0",
     "ipfs-http-client": "^55.0.0",
     "isomorphic-fetch": "^3.0.0",
+    "lit-js-sdk": "^1.1.181",
     "node-localstorage": "^2.2.1",
     "node-watch": "^0.7.1",
     "postcss": "^8.2.6",
