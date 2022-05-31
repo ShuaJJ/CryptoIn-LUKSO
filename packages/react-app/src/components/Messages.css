@@ -27,3 +27,16 @@
     border-radius: 8px;
 }
 
+.conversation-item {
+    font-size: 22px;
+}
+
+.conversation-item button {
+    margin-left: 120px;
+}
+
+.conversation-item img {
+    width: 64px;
+    border-radius: 32px;
+    margin-right: 15px;
+}

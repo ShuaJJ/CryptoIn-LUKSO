@@ -345,7 +345,7 @@ function App(props) {
           <MyAccount provider={userProviderAndSigner} address={address} loadWeb3Modal={loadWeb3Modal} rss3={rss3} />
         </Route>
         <Route exact path="/chats">
-          {userSigner ? <Conversations signer={userSigner} /> : <LoadingOutlined />}
+          {userSigner ? <Conversations provider={userProviderAndSigner} signer={userSigner} /> : <LoadingOutlined />}
         </Route>
       </Switch>
 

@@ -4,9 +4,10 @@ import { Client } from '@xmtp/xmtp-js'
 
 import './Conversations.css';
 import Messages from "../components/Messages";
+import { LoadingOutlined } from "@ant-design/icons";
 
 
-export default function Conversations({ signer }) {
+export default function Conversations({ provider, signer }) {
 
   const [client, setClient] = useState(null);
 
@@ -29,10 +30,20 @@ export default function Conversations({ signer }) {
     }
   }, [])
 
+  if (!client) {
+    return <div style={{marginTop: "32px"}}><LoadingOutlined /></div>
+  }
+
   return (
     <div className="convs">
       <div className="convs-intro">Here you can message the developers of this dapp but under some conditions:</div>
-      <Messages client={client} recipient="0xC4cD7F3F5B282d40840E1C451EC93FFAE61514f9" />
+      <div className="convs-rule">For the folloing two people, you have to follow them through CyberConnect in order to chat with them</div>
+      <Messages 
+        provider={provider} 
+        client={client} 
+        recipient={{ address: "0xC4cD7F3F5B282d40840E1C451EC93FFAE61514f9", avatar: "https://is4-ssl.mzstatic.com/image/thumb/Purple7/v4/0a/bf/ee/0abfee13-a9d6-bac8-52c3-96c4a9cd0d07/source/256x256bb.jpg", name: "JeremyJ" }} 
+        isCyberConnect={true} 
+      /> 
     </div>
   );
 }
