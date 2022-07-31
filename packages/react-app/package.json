@@ -22,6 +22,7 @@
     "@apollo/react-hooks": "^4.0.0",
     "@cyberlab/cyberconnect": "^4.4.2",
     "@eth-optimism/sdk": "^1.0.0",
+    "@lukso/lsp-factory.js": "^2.3.2",
     "@portis/web3": "^4.0.5",
     "@ramp-network/ramp-instant-sdk": "^2.2.0",
     "@testing-library/jest-dom": "^5.11.4",

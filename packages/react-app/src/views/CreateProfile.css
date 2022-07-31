@@ -1,0 +1,13 @@
+.profile-form .form-title {
+    margin-top: 15px;
+    margin-bottom: 8px;
+}
+
+.profile-form {
+    margin-bottom: 32px;
+}
+
+.profile-form button {
+    width: 100%;
+    margin-top: 32px;
+}

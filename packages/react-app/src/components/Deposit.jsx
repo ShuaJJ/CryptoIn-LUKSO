@@ -6,7 +6,7 @@ const ethers = require("ethers");
 
 export default function Deposit({ address, signer }) {
 
-    const walletContract = new ethers.Contract("0x12Fd542974c73Be6D9E5127E7e7DFA8a4cee5419", WalletABI, signer);
+    const walletContract = new ethers.Contract("0x177131ED637DB5be04B897126a7b1EEcdfd1aAcf", WalletABI, signer);
 
     const [balance, setBalance] = useState("0.0");
     const [loading, setLoading] = useState(false);

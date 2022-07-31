@@ -19,9 +19,10 @@ import Deposit from "./components/Deposit";
 import Tip from "./components/Tip";
 import Conversations from "./views/Conversations";
 import { LoadingOutlined } from "@ant-design/icons";
+import CreateProfileBtn from "./components/CreateProfileBtn";
 
 const { ethers } = require("ethers");
-const initialNetwork = NETWORKS.rinkeby;
+const initialNetwork = NETWORKS.luksoL16;
 const USE_BURNER_WALLET = false; // toggle burner wallet feature
 
 const web3Modal = Web3ModalSetup();
@@ -37,7 +38,7 @@ function App(props) {
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
-  const [isRinkeby, setIsRinkeby] = useState(false);
+  const [isL16, setIsL16] = useState(false);
   const [rss3, setRss3] = useState();
   const [userSigner, setUserSigner] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(initialNetwork.name);
@@ -72,34 +73,17 @@ function App(props) {
         setAddress(newAddress);
 
         const chainId = await userSigner.getChainId();
-        setIsRinkeby(chainId == 4);
-        
+        setIsL16(chainId == 2828);
+
         const r3 = new RSS3({
           endpoint: 'https://prenode.rss3.dev',
           address: newAddress,
           sign: async (data) => await userSigner.signMessage(data),
         });
         setRss3(r3);
-        
-        // const pubKey = await generateNextIDSignature(newAddress);
-        // const nextIdResponse = await axios.post("https://proof-service.nextnext.id/v1/proof/payload", {
-          //   "action": "create",
-          //   "platform": "ethereum",
-          //   "identity": newAddress,
-          //   "public_key": pubKey
-        // });
 
-        // console.log('OOOO', nextIdResponse);
-
-        // const account1 = {
-        //   id: RSS3Utils.id.getAccount('NextIDPubKey', pubKey), // 'Twitter-DIYgod'
-        // };
-        // await rss3.profile.accounts.post(account1);
-        // const account2 = {
-        //   id: RSS3Utils.id.getAccount('NextIDUUID', nextIdResponse.body.uuid), // 'Twitter-DIYgod'
-        // };
-        // await rss3.profile.accounts.post(account2);
-        // await rss3.files.sync();
+        const accounts = await r3.profile.accounts.getList();
+        console.log('CCCCCC', accounts);
       }
     }
     getAddress();
@@ -146,7 +130,7 @@ function App(props) {
         {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
         <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", flex: 1, paddingTop: "8px" }}>
-            {isRinkeby ? <Deposit address={address} signer={userSigner} /> : (userSigner && <span>Please switch to Rinkeby</span>)}
+            {isL16 ? <Deposit address={address} signer={userSigner} /> : (userSigner && <span>Please switch to LUKSO L16 Testnet</span>)}
             <Account
               useBurner={USE_BURNER_WALLET}
               address={address}
@@ -158,6 +142,7 @@ function App(props) {
               logoutOfWeb3Modal={logoutOfWeb3Modal}
               blockExplorer={blockExplorer}
             />
+            {address && rss3 && <CreateProfileBtn rss3={rss3} address={address} />}
             <ThemeSwitch />
           </div>
         </div>
@@ -205,7 +190,7 @@ function App(props) {
               <br/>
               <strong style={{fontSize: '17px'}}>Joshua Jiang - The Developer</strong>
               <div style={{marginBottom: "15px"}}>I am a web3 developer who is currently working for <a href="https://theunit.one">The Unit</a>. I am glad about registering this Hackthon and learned all these new projects. </div>
-              {isRinkeby && <Tip signer={userSigner} />}
+              {isL16 && <Tip signer={userSigner} />}
       </div>
     </div>
   );

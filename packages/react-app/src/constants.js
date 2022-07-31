@@ -209,6 +209,14 @@ export const NETWORKS = {
     rpcUrl: "https://godwoken-testnet-v1.ckbapp.dev",
     faucet: "https://testnet.bridge.godwoken.io",
   },
+  luksoL16: {
+    name: "luksoL16",
+    color: "#000000",
+    chainId: 2828,
+    blockExplorer: "https://explorer.execution.l16.lukso.network",
+    rpcUrl: "https://rpc.l16.lukso.network",
+    faucet: "https://faucet.l16.lukso.network",
+  }
 };
 
 export const NETWORK = chainId => {
